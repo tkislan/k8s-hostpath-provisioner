@@ -10,7 +10,8 @@ jobs:
       goarch:
         type: string
       goarm:
-        type: string
+        type: integer
+        default: 0
       img:
         type: string
       tag:
@@ -41,7 +42,6 @@ workflows:
       - build:
           name: 'AMD64'
           goarch: amd64
-          goarm: ''
           img: 'alpine:3.11.3'
           tag: 'amd64-latest'
       - build:
