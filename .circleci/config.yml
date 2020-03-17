@@ -22,18 +22,17 @@ jobs:
 
       - setup_remote_docker
 
-      # - run:
-      #     name: Docker login
-      #     command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
+      - run:
+          name: Docker login
+          command: docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASS}
 
       - run:
           name: Build image
-          # command: docker build --build-arg MODEL_URL="<< parameters.model_url >>" -t ${IMAGE_NAME} .
           command: docker build --build-arg goarch="<< parameters.goarch >>" --build-arg goarm="<< parameters.goarm >>" --build-arg img="<< parameters.img >>" -t tkislan/hostpath-provisioner:"<< parameters.tag >>" .
 
-      # - run:
-      #     name: Push image
-      #     command: docker push tkislan/hostpath-provisioner:"<< parameters.tag >>"
+      - run:
+          name: Push image
+          command: docker push tkislan/hostpath-provisioner:"<< parameters.tag >>"
 
 workflows:
   version: 2
