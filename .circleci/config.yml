@@ -47,10 +47,12 @@ workflows:
           name: 'ARMv7'
           goarch: arm
           goarm: '7'
-          img: 'arm32v7/alpine:3.11.3'
+          # img: 'arm32v7/alpine:3.11.3'
+          img: arm32v7/golang:1.14.0-buster
           tag: 'armv7-latest'
       - build:
           name: 'ARM64'
           goarch: arm64
-          img: 'arm64v8/alpine:3.11.3'
+          # img: 'arm64v8/alpine:3.11.3'
+          img: arm64v8/golang:1.14.0-buster
           tag: 'arm64v8-latest'
