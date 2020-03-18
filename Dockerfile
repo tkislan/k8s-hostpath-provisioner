@@ -8,7 +8,7 @@ WORKDIR /go/src/src
 
 COPY src .
 
-RUN CGO_ENABLED=0 GOARCH=${goarch} GOARM=${goarmv} go build -a -ldflags '-extldflags "-static"' -o hostpath-provisioner .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${goarch} GOARM=${goarmv} go build -a -ldflags '-extldflags "-static"' -o hostpath-provisioner .
 
 FROM ${img}
 
