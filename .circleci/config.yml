@@ -7,12 +7,7 @@ jobs:
     environment:
       IMAGE_NAME: image-object-detection
     parameters:
-      goarch:
-        type: string
-      goarm:
-        type: string
-        default: ''
-      img:
+      dockerfile:
         type: string
       tag:
         type: string
@@ -28,11 +23,11 @@ jobs:
 
       - run:
           name: Build image
-          command: docker build --build-arg goarch="<< parameters.goarch >>" --build-arg goarm="<< parameters.goarm >>" --build-arg img="<< parameters.img >>" -t tkislan/hostpath-provisioner:"<< parameters.tag >>" .
+          command: docker build -f << parameters.dockerfile >> -t tkislan/hostpath-provisioner:<< parameters.tag >> .
 
       - run:
           name: Push image
-          command: docker push tkislan/hostpath-provisioner:"<< parameters.tag >>"
+          command: docker push tkislan/hostpath-provisioner:<< parameters.tag >>
 
 workflows:
   version: 2
@@ -40,19 +35,13 @@ workflows:
     jobs:
       - build:
           name: 'AMD64'
-          goarch: amd64
-          img: 'alpine:3.11.3'
+          dockerfile: Dockerfile
           tag: 'amd64-latest'
       - build:
           name: 'ARMv7'
-          goarch: arm
-          goarm: '7'
-          # img: 'arm32v7/alpine:3.11.3'
-          img: arm32v7/golang:1.14.0-buster
+          dockerfile: Dockerfile.armhf
           tag: 'armv7-latest'
       - build:
           name: 'ARM64'
-          goarch: arm64
-          # img: 'arm64v8/alpine:3.11.3'
-          img: arm64v8/golang:1.14.0-buster
+          dockerfile: Dockerfile.armhf
           tag: 'arm64v8-latest'

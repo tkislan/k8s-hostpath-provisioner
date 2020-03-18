@@ -1,0 +1,32 @@
+FROM golang:1.13-buster as builder
+LABEL os=linux
+LABEL arch=arm64
+
+ENV GOOS=linux
+ENV GOARCH=arm64
+ENV CGO_ENABLED=1
+ENV CC=aarch64-linux-gnu-gcc
+ENV PATH="/go/bin/${GOOS}_${GOARCH}:${PATH}"
+ENV PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
+
+RUN dpkg --add-architecture arm64 \
+    && apt update \
+    && apt install -y --no-install-recommends \
+        gcc-aarch64-linux-gnu \
+        libc6-dev-arm64-cross \
+        pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /go/src/src
+
+COPY src .
+
+RUN go build -o hostpath-provisioner .
+
+FROM multiarch/ubuntu-core:arm64-bionic
+
+WORKDIR /
+
+COPY --from=builder /go/src/src/hostpath-provisioner /hostpath-provisioner
+
+CMD /hostpath-provisioner

@@ -1,0 +1,33 @@
+FROM golang:1.13-buster as builder
+LABEL os=linux
+LABEL arch=armv7
+
+ENV GOOS=linux
+ENV GOARCH=arm
+ENV GOARM=7
+ENV CGO_ENABLED=1
+ENV CC=arm-linux-gnueabihf-gcc
+ENV PATH="/go/bin/${GOOS}_${GOARCH}:${PATH}"
+ENV PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig
+
+RUN dpkg --add-architecture armhf \
+    && apt update \
+    && apt install -y --no-install-recommends \
+        gcc-arm-linux-gnueabihf \
+        libc6-dev-armhf-cross \
+        pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /go/src/src
+
+COPY src .
+
+RUN go build -o hostpath-provisioner .
+
+FROM multiarch/ubuntu-core:armhf-bionic
+
+WORKDIR /
+
+COPY --from=builder /go/src/src/hostpath-provisioner /hostpath-provisioner
+
+CMD /hostpath-provisioner
