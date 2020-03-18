@@ -44,8 +44,8 @@ import (
 /* Our constants */
 const (
 	resyncPeriod     = 15 * time.Second
-	provisionerName  = "torchbox.com/hostpath"
-	provisionerIDAnn = "torchbox.com/hostpath-provisioner-id"
+	provisionerName  = "tkislan.com/hostpath"
+	provisionerIDAnn = "tkislan.com/hostpath-provisioner-id"
 )
 
 /* Our provisioner class, which implements the controller API. */
@@ -87,7 +87,7 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 	}
 
 	/*
-	 * Extract the PV capacity as bytes.  We can use this to set CephFS
+	 * Extract the PV capacity as bytes.
 	 * quotas.
 	 */
 	capacity := options.PVC.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
@@ -103,17 +103,6 @@ func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.P
 	if err := os.MkdirAll(path, 0777); err != nil {
 		glog.Errorf("failed to mkdir %s: %s", path, err)
 		return nil, err
-	}
-
-	/* Set CephFS quota, if enabled */
-	if params.cephFSQuota {
-		err := xattr.Set(path, "ceph.quota.max_bytes", []byte(strconv.FormatInt(volbytes, 10)))
-		if err != nil {
-			glog.Errorf("could not set CephFS quota on %s (%s): %s",
-				options.PVName, path, err)
-			os.RemoveAll(path)
-			return nil, err
-		}
 	}
 
 	/* The actual PV we will create */
